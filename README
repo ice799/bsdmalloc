@@ -1,0 +1,41 @@
+bsdmalloc (for Linux)     Joe Damato   @joedamato   http://timetobleed.com 
+==========================================================================
+
+
+**WARNING:    bsdmalloc is  -NOT- threadsafe. Do *not* use in applications with threads.
+
+Build it
+========
+% make
+
+Then you can either link against libbsdmalloc.so (-lbsdmalloc) or preload:
+
+% LD_PRELOAD=/path/to/libbsdmalloc.so /path/to/app
+
+
+What is bsdmalloc?
+==================
+bsdmalloc is a *fast* malloc implementation that I snagged from NetBSD. I did
+some minimal porting work to get it to build on my amd64 Linux box.
+
+
+Why another malloc?
+===================
+Different malloc implementations are good for different things. This particular
+implementation is good if you don't care about multithreaded applications or
+heap fragmentation. It has really fast malloc/free, though.
+
+
+Simple, stupid, benchmark against glibc's malloc and tcmalloc
+=============================================================
+In my simple, stupid test, bsdmalloc is *quite a bit* faster than tcmalloc and 
+*way* faster than glibc's malloc.
+
+LD_PRELOAD=/home/joe/code/small_malloc/bsdmalloc/libbsdmalloc.so.1.0.1 /usr/bin/time ./test
+22.42user 0.01system 0:22.48elapsed 99%CPU
+ 
+LD_PRELOAD=/custom/lib/libtcmalloc_minimal.so.0.0.0 /usr/bin/time ./test
+36.89user 0.02system 0:37.00elapsed 99%CPU (0avgtext+0avgdata 0maxresident)k
+ 
+/usr/bin/time ./test
+78.02user 0.11system 1:18.23elapsed 99%CPU (0avgtext+0avgdata 0maxresident)k
